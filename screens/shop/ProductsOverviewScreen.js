@@ -10,18 +10,20 @@ import * as productsActions from '../../store/actions/products';
 
 const ProductsOverviewScreen = props => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState();
   const products = useSelector(state => state.products.availableProducts);
   const dispatch = useDispatch(); 
 
   const loadProducts = useCallback(async () => {
-    setIsLoading(true);
+    setError(null);
+    setIsRefreshing(true);
     try {
       await dispatch(productsActions.fetchProducts());
     } catch (err) {
       setError(err.message);
     }
-    setIsLoading(false);
+    setIsRefreshing(false);
   }, [dispatch, setIsLoading, setError]);
 
   // reload data whenever we change to navigation screen
@@ -34,7 +36,10 @@ const ProductsOverviewScreen = props => {
 
   // fire effect (fetch products) when screen is loaded
   useEffect(() => {
-    loadProducts(); 
+    setIsLoading(true);
+    loadProducts().then(() => {
+      setIsLoading(false);
+    }); 
   }, [dispatch, loadProducts]);
 
   const selectItemHandler = (id, title) => {
@@ -56,6 +61,8 @@ const ProductsOverviewScreen = props => {
   }
   return (
     <FlatList
+      onRefresh={loadProducts}
+      refreshing={isRefreshing}
       data={products}
       keyExtractor={item => item.id}
       renderItem={
