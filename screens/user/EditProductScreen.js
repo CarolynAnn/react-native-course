@@ -141,7 +141,6 @@ const EditProductScreen = props => {
           label="Title"
           keyboardType="default"
           autoCapitalize="sentences"
-          autoCorrect
           returnKeyType="next"  
           errorText="Please enter a valid title!"
           onInputChange={inputChangeHandler}
